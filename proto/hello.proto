@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package hello;
+
+service Say {
+  rpc Send (SayRequest) returns (SayResponse);
+}
+message SayRequest {
+  string name = 1;
+}
+message SayResponse {
+  string message = 1;
+}
+
+service Area {
+  rpc Send (AreaRequest) returns (AreaResponse); 
+}
+message AreaRequest {
+  int32 x = 1; 
+  int32 y = 2; 
+}
+message AreaResponse { 
+  int32 result = 1; 
+}
