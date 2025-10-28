@@ -4,6 +4,9 @@ use hello::say_server::{Say, SayServer};
 use hello::area_server::{Area, AreaServer};
 use hello::{SayResponse, SayRequest, AreaRequest, AreaResponse};
 use tonic::{transport::Server, Request, Response, Status};
+use tonic_reflection::server::Builder as ReflectionBuilder;
+
+const FILE_DESCRIPTOR_SET: &[u8] = include_bytes!("hello_descriptor.bin");
 
 #[derive(Clone)]
 struct ApiKey(String);
@@ -55,8 +58,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let say = MySay::default();
     let area = MyArea::default();
 
+    let reflection_service = ReflectionBuilder::configure()
+        .register_encoded_file_descriptor_set(FILE_DESCRIPTOR_SET)
+        .build_v1()
+        .unwrap();
+
+
     println!("Server listening on {}", addr);
     Server::builder()
+            .add_service(reflection_service)
             .add_service(SayServer::with_interceptor(say, api_key_interceptor))
             .add_service(AreaServer::new(area))
             .serve(addr)
